@@ -1,15 +1,30 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { setCredentials } from '../slices/authSlice';
+
+
+import { signUp } from '../api/apiService';
 const SignUpPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
+  
+  const dispatch = useDispatch();
+
 
 
   const navigate = useNavigate();
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
-    navigate('/dashboard');
+    try {
+      const { token } = await signUp(email, password);
+      dispatch(setCredentials({ token, user: { email } }));
+      navigate('/dashboard');
+    } catch (err) {
+      setError('Invalid credentials');
+    }
   };
 
   return (
